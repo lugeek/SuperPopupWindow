@@ -1,4 +1,8 @@
 <resources>
+    <style name="SearchWindowAnimation" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/search_push_top_in</item>
+        <item name="android:windowExitAnimation">@anim/search_push_top_out</item>
+    </style>
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">

@@ -20,9 +20,13 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder>{
     private Context mContext;
     private List<TabModel> mData;
     private int mSelectedPos = NOT_CLICKED;
+    private SuperPopupWindow popupWindow;
+
+
     public PopupAdapter(Context context, List<TabModel> data) {
         this.mContext = context;
         this.mData = data;
+        this.popupWindow = new SuperPopupWindow(context);
     }
 
     @Override
@@ -47,15 +51,21 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder>{
                 if (mSelectedPos == position) {
                     mSelectedPos = NOT_CLICKED;
                     PopupAdapter.this.notifyItemChanged(position);
+                    popupWindow.show(view);
+                    popupWindow.update(mData.get(position).mValues);
                 } else {
                     if (mSelectedPos == NOT_CLICKED) {
                         mSelectedPos = position;
                         PopupAdapter.this.notifyItemChanged(position);
+                        popupWindow.show(view);
+                        popupWindow.update(mData.get(position).mValues);
                     } else {
                         int temp = mSelectedPos;
                         mSelectedPos = position;
                         PopupAdapter.this.notifyItemChanged(temp);
                         PopupAdapter.this.notifyItemChanged(position);
+                        popupWindow.show(view);
+                        popupWindow.update(mData.get(position).mValues);
                     }
                 }
             }
@@ -80,10 +90,10 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder>{
 
         public void setClicked(boolean clicked) {
             if (clicked) {
-                mLlName.setSelected(true);
+                mLlName.setBackgroundResource(R.drawable.item1_2);
                 mLlWhite.setVisibility(View.VISIBLE);
             } else {
-                mLlName.setSelected(false);
+                mLlName.setBackgroundResource(R.drawable.item1_1);
                 mLlWhite.setVisibility(View.INVISIBLE);
             }
         }
