@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button2.setOnClickListener(this);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         initData();
-        adapter = new PopupAdapter(this, mData);
+        adapter = new PopupAdapter(this, mData, recyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             model.mSelected = false;
             model.mValues = new ArrayList<>();
             for (int j = 0; j < 9; j++) {
-                model.mValues.add("Value" + j);
+                model.mValues.add("Tab"+ i + "-" + j);
             }
             mData.add(model);
         }
