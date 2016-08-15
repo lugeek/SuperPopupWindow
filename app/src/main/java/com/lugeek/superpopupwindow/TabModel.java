@@ -7,7 +7,8 @@ import java.util.List;
  */
 public class TabModel {
 
-    public String mName;
-    public boolean mSelected;
-    public List<String> mValues;
+    public int mAttrId;
+    public String mAttrName;
+    public List<ValueModel> mValues;
+    public String mSelectedName;
 }

@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by ljm on 2016/8/5.
  */
-public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder>{
+public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder> implements DataRepository.OnLoadListener{
 
     private static final int NOT_CLICKED = -1;
     private Context mContext;
@@ -49,17 +49,24 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder>{
         this.mPopupWindow.setClickListener(new SuperPopupWindow.ValueClickListener() {
             @Override
             public void onClick(String value) {
-                int pos = mSelectedPos;
+                int from = mSelectedPos;
                 invokePopup(NOT_CLICKED);
                 ((RecyclerView)mAnchorView).smoothScrollToPosition(0);
-                mData.remove(pos);
-                PopupAdapter.this.notifyItemRemoved(pos);
-                TabModel model = new TabModel();
-                model.mName = value;
-                model.mSelected = true;
-                PopupAdapter.this.notifyItemInserted(addData(model));
+                TabModel selectedModel = mData.get(from);
+                selectedModel.mSelectedName = value;
+                mData.remove(from);
+                int targetPos = addData(selectedModel);
+                notifyItemMoved(from, targetPos);
+//                PopupAdapter.this.notifyItemRemoved(from);
+//                PopupAdapter.this.notifyItemInserted(addData(tempModel));
+                DataRepository.getInstance().getData(mData, PopupAdapter.this);
             }
         });
+    }
+
+    @Override
+    public void onSuccess(List<TabModel> result) {
+        notifyDataSetChanged();
     }
 
     public int addData(TabModel model) {
@@ -74,7 +81,7 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder>{
         }
         int pos = mData.size();
         for (int i = 0; i < mData.size(); i++) {
-            if (!mData.get(i).mSelected) {
+            if (mData.get(i).mSelectedName.isEmpty()) {
                 pos = i;
                 break;
             }
@@ -119,13 +126,8 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder>{
 
     @Override
     public void onBindViewHolder(final Viewholder holder, int position) {
-        holder.mBtnName.setText(mData.get(position).mName);
-        if (mData.get(position).mSelected) {
-//            holder.mBtnName.setBackgroundResource(R.drawable.item2);
-            holder.mBtnName.setTextColor(Color.RED);
-        } else {
-            holder.mBtnName.setTextColor(Color.BLACK);
-        }
+        holder.mBtnName.setText(mData.get(position).mSelectedName.isEmpty() ? mData.get(position).mAttrName : mData.get(position).mSelectedName);
+        holder.mBtnName.setTextColor(mData.get(position).mSelectedName.isEmpty() ? Color.BLACK : Color.RED);
         if (mSelectedPos == position) {
             holder.mLlName.setBackgroundResource(R.drawable.item1_2);
             holder.mLlWhite.setVisibility(View.VISIBLE);
@@ -137,10 +139,11 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder>{
             @Override
             public void onClick(View view) {
                 int pos = holder.getAdapterPosition();
-                if (mData.get(pos).mSelected) {
+                if (!mData.get(pos).mSelectedName.isEmpty()) {
                     invokePopup(NOT_CLICKED);
                     mData.remove(pos);
                     notifyItemRemoved(pos);
+                    DataRepository.getInstance().getData(mData, PopupAdapter.this);
                 } else {
                     invokePopup(pos);
                 }

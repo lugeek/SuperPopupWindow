@@ -25,7 +25,7 @@ public class SuperPopupWindow extends PopupWindow{
 
     private Context mContext;
     private RecyclerView mRvContent;
-    private List<String> mData = new ArrayList<>();
+    private List<ValueModel> mData = new ArrayList<>();
     private ContentAdapter mAdapter;
     private View backView;
     private ValueClickListener mClickListener;
@@ -57,7 +57,7 @@ public class SuperPopupWindow extends PopupWindow{
         this.mClickListener = listener;
     }
 
-    public void show(View view, List<String> data) {
+    public void show(View view, List<ValueModel> data) {
         if (data != null) {
             update(data);
         }
@@ -86,7 +86,7 @@ public class SuperPopupWindow extends PopupWindow{
         }
     }
 
-    public void update(List<String> data) {
+    public void update(List<ValueModel> data) {
         mAdapter.update(data);
     }
 
@@ -120,13 +120,13 @@ public class SuperPopupWindow extends PopupWindow{
 
     class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.MyViewHolder> {
 
-        private List<String> mData;
+        private List<ValueModel> mData;
 
-        public ContentAdapter(List<String> data) {
+        public ContentAdapter(List<ValueModel> data) {
             this.mData = data;
         }
 
-        public void update(List<String> data) {
+        public void update(List<ValueModel> data) {
             mData.clear();
             mData.addAll(data);
             this.notifyDataSetChanged();
@@ -139,11 +139,11 @@ public class SuperPopupWindow extends PopupWindow{
 
         @Override
         public void onBindViewHolder(MyViewHolder holder, final int position) {
-            holder.mTvName.setText(mData.get(position));
+            holder.mTvName.setText(mData.get(position).mVname);
             holder.mTvName.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClickListener.onClick(mData.get(position));
+                    mClickListener.onClick(mData.get(position).mVname);
                 }
             });
         }

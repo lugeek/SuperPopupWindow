@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button button1;
     Button button2;
     RecyclerView recyclerView;
-    List<TabModel> mData = new ArrayList<>();
+    List<TabModel> mData;
     PopupAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,25 +32,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button2 = (Button) findViewById(R.id.button2);
         button2.setOnClickListener(this);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
-        initData();
-        adapter = new PopupAdapter(this, mData, recyclerView);
+        mData = DataRepository.getInstance().initData();
+        adapter = new PopupAdapter(this, DataRepository.getInstance().initData(), recyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(adapter);
-    }
-
-    private void initData() {
-        for (int i = 0; i < 6; i++) {
-            TabModel model = new TabModel();
-            model.mName = "TAB" + i;
-            model.mSelected = false;
-            model.mValues = new ArrayList<>();
-            for (int j = 0; j < 9; j++) {
-                model.mValues.add("Tab"+ i + "-" + j);
-            }
-            mData.add(model);
-        }
     }
 
     @Override
