@@ -46,11 +46,11 @@ public class SuperPopupWindow extends PopupWindow{
         setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         setAnimationStyle(R.style.SearchWindowAnimation);
         backView = new View(mContext);
-        backView.setBackgroundColor(Color.parseColor("#66ff4965"));
+        backView.setBackgroundColor(Color.parseColor("#669f9f9f"));
     }
 
     public interface ValueClickListener {
-        public void onClick(String value);
+        void onClick(String value);
     }
 
     public void setClickListener(ValueClickListener listener) {

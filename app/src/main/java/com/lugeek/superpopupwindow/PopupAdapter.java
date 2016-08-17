@@ -2,6 +2,7 @@ package com.lugeek.superpopupwindow;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -48,17 +49,24 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder> 
         });
         this.mPopupWindow.setClickListener(new SuperPopupWindow.ValueClickListener() {
             @Override
-            public void onClick(String value) {
-                int from = mSelectedPos;
-                invokePopup(NOT_CLICKED);
-                ((RecyclerView)mAnchorView).smoothScrollToPosition(0);
-                TabModel selectedModel = mData.get(from);
-                selectedModel.mSelectedName = value;
-                mData.remove(from);
-                int targetPos = addData(selectedModel);
-                notifyItemMoved(from, targetPos);
-//                PopupAdapter.this.notifyItemRemoved(from);
-//                PopupAdapter.this.notifyItemInserted(addData(tempModel));
+            public void onClick(final String value) {
+                final int from = mSelectedPos;
+                final TabModel selectedModel = mData.get(from);
+                mPopupWindow.close();
+                mSelectedPos = NOT_CLICKED;
+                notifyDataSetChanged();
+                ((RecyclerView)mAnchorView).scrollToPosition(0);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mData.remove(from);
+                        notifyItemRemoved(from);
+                        selectedModel.mSelectedName = value;
+                        int targetPos = addData(selectedModel);
+                        notifyItemInserted(targetPos);
+                        ((RecyclerView)mAnchorView).scrollToPosition(0);
+                    }
+                },10);
                 DataRepository.getInstance().getData(mData, PopupAdapter.this);
             }
         });
@@ -66,7 +74,14 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder> 
 
     @Override
     public void onSuccess(List<TabModel> result) {
-        notifyDataSetChanged();
+        int from = 0;
+        for (int i = 0; i < result.size(); i++) {
+            if (result.get(i).mSelectedName.isEmpty()) {
+                from = i;
+                break;
+            }
+        }
+        notifyItemRangeChanged(from, result.size() - from);
     }
 
     public int addData(TabModel model) {
@@ -94,24 +109,24 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder> 
         if (mSelectedPos == NOT_CLICKED) {      //PopupWindow未打开
             if (targetPosition == NOT_CLICKED) return;
             mSelectedPos = targetPosition;
-            PopupAdapter.this.notifyItemChanged(targetPosition);
+            notifyItemChanged(targetPosition);
             mPopupWindow.show(mAnchorView, mData.get(targetPosition).mValues);
         } else {                                //PopupWindow已打开
             if (targetPosition == NOT_CLICKED) {              //点击外部空白,关闭
                 int temp = mSelectedPos;
                 mSelectedPos = NOT_CLICKED;
-                PopupAdapter.this.notifyItemChanged(temp);
+                notifyItemChanged(temp);
                 mPopupWindow.close();
             } else {
                 if (mSelectedPos == targetPosition) {         //点击已打开的位置,则关闭
                     mSelectedPos = NOT_CLICKED;
-                    PopupAdapter.this.notifyItemChanged(targetPosition);
+                    notifyItemChanged(targetPosition);
                     mPopupWindow.close();
-                } else {                                //点击未打开的位置,则切换
+                } else {                                      //点击未打开的位置,则切换
                     int temp = mSelectedPos;
                     mSelectedPos = targetPosition;
-                    PopupAdapter.this.notifyItemChanged(temp);
-                    PopupAdapter.this.notifyItemChanged(targetPosition);
+                    notifyItemChanged(temp);
+                    notifyItemChanged(targetPosition);
                     mPopupWindow.show(mAnchorView, mData.get(targetPosition).mValues);
                 }
             }
@@ -121,20 +136,34 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder> 
 
     @Override
     public Viewholder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new Viewholder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false));
+        return new Viewholder(LayoutInflater.from(parent.getContext()).inflate(R.layout.filter_item, parent, false));
     }
 
     @Override
     public void onBindViewHolder(final Viewholder holder, int position) {
-        holder.mBtnName.setText(mData.get(position).mSelectedName.isEmpty() ? mData.get(position).mAttrName : mData.get(position).mSelectedName);
-        holder.mBtnName.setTextColor(mData.get(position).mSelectedName.isEmpty() ? Color.BLACK : Color.RED);
-        if (mSelectedPos == position) {
-            holder.mLlName.setBackgroundResource(R.drawable.item1_2);
+
+        if (mSelectedPos == position) {//弹出popupwindow
+            holder.mBtnName.setText(mData.get(position).mAttrName);
+            holder.mBtnName.setTextColor(Color.parseColor("#676767"));
+            holder.mBtnName.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.filter_item_up, 0);
+            holder.mLlName.setBackgroundResource(R.drawable.filter_item_popup);
             holder.mLlWhite.setVisibility(View.VISIBLE);
         } else {
-            holder.mLlName.setBackgroundResource(R.drawable.item1_1);
-            holder.mLlWhite.setVisibility(View.INVISIBLE);
+            if (mData.get(position).mSelectedName.isEmpty()) {//收起popupwindow，且没有选中值
+                holder.mBtnName.setText(mData.get(position).mAttrName);
+                holder.mBtnName.setTextColor(Color.parseColor("#676767"));
+                holder.mBtnName.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.filter_item_down, 0);
+                holder.mLlName.setBackgroundResource(R.drawable.filter_item_normal);
+                holder.mLlWhite.setVisibility(View.INVISIBLE);
+            } else {//收起popupwindow，且有选中值
+                holder.mBtnName.setText(mData.get(position).mSelectedName);
+                holder.mBtnName.setTextColor(Color.parseColor("#ff4965"));
+                holder.mBtnName.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.filter_item_close, 0);
+                holder.mLlName.setBackgroundResource(R.drawable.filter_item_selected);
+                holder.mLlWhite.setVisibility(View.INVISIBLE);
+            }
         }
+
         holder.mLlName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -157,24 +186,14 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder> 
     }
 
     public static class Viewholder extends RecyclerView.ViewHolder{
-        public TextView mBtnName;
-        public LinearLayout mLlName;
-        public LinearLayout mLlWhite;
-        public Viewholder(View itemView) {
+        TextView mBtnName;
+        LinearLayout mLlName;
+        LinearLayout mLlWhite;
+        Viewholder(View itemView) {
             super(itemView);
             mBtnName = (TextView) itemView.findViewById(R.id.name);
             mLlName = (LinearLayout) itemView.findViewById(R.id.name_box);
             mLlWhite = (LinearLayout) itemView.findViewById(R.id.ll_white);
-        }
-
-        public void setClicked(boolean clicked) {
-            if (clicked) {
-                mLlName.setBackgroundResource(R.drawable.item1_2);
-                mLlWhite.setVisibility(View.VISIBLE);
-            } else {
-                mLlName.setBackgroundResource(R.drawable.item1_1);
-                mLlWhite.setVisibility(View.INVISIBLE);
-            }
         }
     }
 }

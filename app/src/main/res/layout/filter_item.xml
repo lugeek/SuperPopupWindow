@@ -9,16 +9,20 @@
     <LinearLayout
         android:id="@+id/name_box"
         android:layout_width="80dp"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:orientation="vertical"
         android:gravity="center"
-        android:background="@drawable/item1_1">
+        android:background="@drawable/filter_item_normal">
         <TextView
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="名字" />
+            android:textColor="#676767"
+            android:textSize="12sp"
+            android:text="名字"
+            android:drawableRight="@drawable/filter_item_down"
+            android:drawablePadding="5dp"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/ll_white"
