@@ -12,6 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -23,12 +26,15 @@ import java.util.List;
  */
 public class SuperPopupWindow extends PopupWindow{
 
+    private static final int ANIMATE_DURATION = 100;
     private Context mContext;
     private RecyclerView mRvContent;
     private List<ValueModel> mData = new ArrayList<>();
     private ContentAdapter mAdapter;
+    private FrameLayout backContainer;
     private View backView;
     private ValueClickListener mClickListener;
+    private boolean isSwitch = false;
 
     public SuperPopupWindow(Context context) {
         this.mContext = context;
@@ -45,6 +51,7 @@ public class SuperPopupWindow extends PopupWindow{
         setOutsideTouchable(true);
         setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         setAnimationStyle(R.style.SearchWindowAnimation);
+        backContainer = new FrameLayout(mContext);
         backView = new View(mContext);
         backView.setBackgroundColor(Color.parseColor("#669f9f9f"));
     }
@@ -66,18 +73,43 @@ public class SuperPopupWindow extends PopupWindow{
         }
     }
 
+    public void switchShow(final View view, final List<ValueModel> data) {
+        isSwitch = true;
+        this.setOnDismissListener(new OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                if (!isShowing()) {
+                    showAsDropDown(view);
+                }
+                if (data != null) {
+                    update(data);
+                }
+            }
+        });
+        close();
+        this.setOnDismissListener(null);
+
+    }
+
+
+
 
 
     @Override
     public void showAsDropDown(View anchor, int xoff, int yoff, int gravity) {
-        addDimBackground(anchor);
+        if (!isSwitch) {
+            addDimBackground(anchor);
+        }
+        isSwitch = false;
         super.showAsDropDown(anchor, xoff, yoff, gravity);
     }
 
     @Override
     public void dismiss() {
+        if (!isSwitch) {
+            removeDimBackground();
+        }
         super.dismiss();
-        removeDimBackground();
     }
 
     public void close() {
@@ -107,13 +139,36 @@ public class SuperPopupWindow extends PopupWindow{
         p.y = xy[1] + anchor.getHeight();
         p.packageName = mContext.getPackageName();
         WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-        wm.addView(backView, p);
+        wm.addView(backContainer, p);
+        backContainer.addView(backView);
+        Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in);
+        animation.setDuration(ANIMATE_DURATION);
+        backView.startAnimation(animation);
     }
 
     public void removeDimBackground() {
-        if (backView != null) {
-            WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-            wm.removeView(backView);
+        if (backContainer != null) {
+            Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.fade_out);
+            animation.setDuration(ANIMATE_DURATION);
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    backContainer.removeAllViews();
+                    WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+                    wm.removeView(backContainer);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            backView.startAnimation(animation);
         }
     }
 

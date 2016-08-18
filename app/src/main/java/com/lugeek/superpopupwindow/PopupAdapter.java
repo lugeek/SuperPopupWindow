@@ -138,7 +138,7 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder> 
                     mSelectedPos = targetPosition;
                     notifyItemChanged(temp);
                     notifyItemChanged(targetPosition);
-                    mPopupWindow.show(mAnchorView, mData.get(targetPosition).mValues);
+                    mPopupWindow.switchShow(mAnchorView, mData.get(targetPosition).mValues);
                 }
             }
 
