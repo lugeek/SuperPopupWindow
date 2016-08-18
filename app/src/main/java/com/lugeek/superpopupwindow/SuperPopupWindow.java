@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class SuperPopupWindow extends PopupWindow{
 
-    private static final int ANIMATE_DURATION = 100;
+    private static final int ANIMATE_DURATION = 200;
     private Context mContext;
     private RecyclerView mRvContent;
     private List<ValueModel> mData = new ArrayList<>();
