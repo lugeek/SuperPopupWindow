@@ -2,6 +2,7 @@ package com.lugeek.superpopupwindow;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -40,6 +41,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
         itemAnimator.setSupportsChangeAnimations(false);
         recyclerView.setItemAnimator(itemAnimator);
+        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                outRect.left = 18;//TODO dp to px
+                if (parent.getChildAdapterPosition(view) == parent.getAdapter().getItemCount() - 1) {
+                    outRect.right = 18;
+                }
+            }
+        });
         recyclerView.setAdapter(adapter);
     }
 
