@@ -139,11 +139,13 @@ public class SuperPopupWindow extends PopupWindow{
         p.y = xy[1] + anchor.getHeight();
         p.packageName = mContext.getPackageName();
         WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-        wm.addView(backContainer, p);
-        backContainer.addView(backView);
-        Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in);
-        animation.setDuration(ANIMATE_DURATION);
-        backView.startAnimation(animation);
+        if (backContainer.getWindowToken() == null) {
+            wm.addView(backContainer, p);
+            backContainer.addView(backView);
+            Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.fade_in);
+            animation.setDuration(ANIMATE_DURATION);
+            backView.startAnimation(animation);
+        }
     }
 
     public void removeDimBackground() {
