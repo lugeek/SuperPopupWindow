@@ -23,7 +23,7 @@ public class HeightCustomRecyclerView extends RecyclerView{
 
     @Override
     protected void onMeasure(int widthSpec, int heightSpec) {
-        heightSpec = MeasureSpec.makeMeasureSpec(720, MeasureSpec.AT_MOST);//TODO dp to px
+        heightSpec = MeasureSpec.makeMeasureSpec(Utils.dip2px(getContext(), 240f), MeasureSpec.AT_MOST);
         super.onMeasure(widthSpec, heightSpec);
     }
 }

@@ -44,9 +44,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-                outRect.left = 18;//TODO dp to px
+                outRect.left = Utils.dip2px(MainActivity.this, 3f);
                 if (parent.getChildAdapterPosition(view) == parent.getAdapter().getItemCount() - 1) {
-                    outRect.right = 18;
+                    outRect.right = Utils.dip2px(MainActivity.this, 3f);
                 }
             }
         });

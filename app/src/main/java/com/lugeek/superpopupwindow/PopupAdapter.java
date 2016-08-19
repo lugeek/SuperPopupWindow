@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -38,19 +37,15 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder> 
             public boolean onTouch(View v, MotionEvent event) {
                 final int x = (int) event.getX();
                 final int y = (int) event.getY();
-                Log.e("onTouch", event.getAction() + "+" + x + "+" +y);
-                //TODO 测试5.0以下滑动是否关闭
                 //拦截所有点击外部的事件,设置关闭.
                 if (event.getAction() == MotionEvent.ACTION_DOWN && ((x < 0) || (x >= v.getWidth()) || (y < 0) || (y >= v.getHeight()))) {
                     if (y < 0 - mAnchorView.getHeight() || y >= v.getHeight()) {
                         invokePopup(NOT_CLICKED);
-                        Log.e("down", "close");
                     }
                     return true;
                 } else if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
                     if (y < 0 - mAnchorView.getHeight() || y >= v.getHeight()) {
                         invokePopup(NOT_CLICKED);
-                        Log.e("outside", "close");
                     }
                     return true;
                 }

@@ -75,19 +75,13 @@ public class SuperPopupWindow extends PopupWindow{
 
     public void switchShow(final View view, final List<ValueModel> data) {
         isSwitch = true;
-        this.setOnDismissListener(new OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                if (!isShowing()) {
-                    showAsDropDown(view);
-                }
-                if (data != null) {
-                    update(data);
-                }
-            }
-        });
         close();
-        this.setOnDismissListener(null);
+        if (!isShowing()) {
+            showAsDropDown(view);
+        }
+        if (data != null) {
+            update(data);
+        }
 
     }
 
