@@ -11,17 +11,6 @@
         android:pivotX="0"
         android:pivotY="0"
         />
-    <!--<translate-->
-        <!--android:duration = "300"-->
-        <!--android:fromXDelta="0"-->
-        <!--android:toXDelta="0"-->
-        <!--android:fromYDelta="-100%"-->
-        <!--android:toYDelta="0%"-->
-        <!--/>-->
 
-    <!--<alpha-->
-    <!--android:duration="5000"-->
-    <!--android:fromAlpha="0.0"-->
-    <!--android:toAlpha="1.0" />-->
 
 </set>
