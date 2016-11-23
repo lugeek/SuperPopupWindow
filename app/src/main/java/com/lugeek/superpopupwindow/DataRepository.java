@@ -33,7 +33,7 @@ public class DataRepository {
 
     public List<TabModel> initData() {
         List<TabModel> list = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 3; i++) {
             TabModel model = new TabModel();
             model.mAttrName = "TAB" + i;
             model.mAttrId = i;
@@ -55,7 +55,7 @@ public class DataRepository {
         AsyncTask task = new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] params) {
-                if (data.size() == 6) {
+                if (data.size() == 3) {
                     for (TabModel t : data) {
                         if (!t.mSelectedName.isEmpty()) continue;
                         ValueModel v = new ValueModel();
@@ -63,7 +63,7 @@ public class DataRepository {
                         t.mValues.add(v);
                     }
                 } else {
-                    while (data.size() < 6) {
+                    while (data.size() < 3) {
                         TabModel model = new TabModel();
                         model.mAttrName = "TABX";
                         model.mAttrId = 10;

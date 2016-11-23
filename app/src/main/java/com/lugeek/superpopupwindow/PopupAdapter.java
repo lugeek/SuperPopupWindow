@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -31,34 +30,20 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder> 
         this.mContext = context;
         this.mData = data;
         this.mAnchorView = anchorView;
-        this.mPopupWindow = new SuperPopupWindow(context);
-        this.mPopupWindow.setTouchInterceptor(new View.OnTouchListener() {
+        this.mPopupWindow = new SuperPopupWindow(context, mAnchorView);
+        this.mPopupWindow.setOutsideClickListener(new SuperPopupWindow.OutsideClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                final int x = (int) event.getX();
-                final int y = (int) event.getY();
-                //拦截所有点击外部的事件,设置关闭.
-                if (event.getAction() == MotionEvent.ACTION_DOWN && ((x < 0) || (x >= v.getWidth()) || (y < 0) || (y >= v.getHeight()))) {
-                    if (y < 0 - mAnchorView.getHeight() || y >= v.getHeight()) {
-                        invokePopup(NOT_CLICKED);
-                    }
-                    return true;
-                } else if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
-                    if (y < 0 - mAnchorView.getHeight() || y >= v.getHeight()) {
-                        invokePopup(NOT_CLICKED);
-                    }
-                    return true;
-                }
-
-                return false;
+            public void onClicked() {
+                invokePopup(NOT_CLICKED);
             }
         });
-        this.mPopupWindow.setClickListener(new SuperPopupWindow.ValueClickListener() {
+
+        this.mPopupWindow.setItemClickListener(new SuperPopupWindow.ItemClickListener() {
             @Override
             public void onClick(final String value) {
                 final int from = mSelectedPos;
                 final TabModel selectedModel = mData.get(from);
-                mPopupWindow.close();
+                mPopupWindow.dismiss();
                 mSelectedPos = NOT_CLICKED;
                 notifyDataSetChanged();
                 ((RecyclerView)mAnchorView).scrollToPosition(0);
@@ -116,24 +101,24 @@ public class PopupAdapter extends RecyclerView.Adapter<PopupAdapter.Viewholder> 
             if (targetPosition == NOT_CLICKED) return;
             mSelectedPos = targetPosition;
             notifyItemChanged(targetPosition);
-            mPopupWindow.show(mAnchorView, mData.get(targetPosition).mValues);
+            mPopupWindow.show(mData.get(targetPosition).mValues);
         } else {                                //PopupWindow已打开
             if (targetPosition == NOT_CLICKED) {              //点击外部空白,关闭
                 int temp = mSelectedPos;
                 mSelectedPos = NOT_CLICKED;
                 notifyItemChanged(temp);
-                mPopupWindow.close();
+                mPopupWindow.dismiss();
             } else {
                 if (mSelectedPos == targetPosition) {         //点击已打开的位置,则关闭
                     mSelectedPos = NOT_CLICKED;
                     notifyItemChanged(targetPosition);
-                    mPopupWindow.close();
+                    mPopupWindow.dismiss();
                 } else {                                      //点击未打开的位置,则切换
                     int temp = mSelectedPos;
                     mSelectedPos = targetPosition;
                     notifyItemChanged(temp);
                     notifyItemChanged(targetPosition);
-                    mPopupWindow.switchShow(mAnchorView, mData.get(targetPosition).mValues);
+                    mPopupWindow.show(mData.get(targetPosition).mValues);
                 }
             }
 
