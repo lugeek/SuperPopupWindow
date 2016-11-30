@@ -39,8 +39,14 @@ public class SuperPopupWindow extends PopupWindow{
     private View mBackView;
     //RecyclerView中Item点击事件
     private ItemClickListener mItemClickListener;
+    //点击外部关闭回调
+    private OutsideClickListener mOutsideClickListener;
     //是否是切换PopupWindow内部的数据，如果是切换，则不关闭蒙层
     private boolean isSwitch = false;
+
+    //防止拖动
+    private int oldX = -1;
+    private int oldY = -1;
 
     public SuperPopupWindow(Context context, View anchorView) {
         this.mContext = context;
@@ -77,6 +83,7 @@ public class SuperPopupWindow extends PopupWindow{
     }
 
     public void setOutsideClickListener(final OutsideClickListener listener) {
+        this.mOutsideClickListener = listener;
         this.setTouchInterceptor(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -129,13 +136,12 @@ public class SuperPopupWindow extends PopupWindow{
         }, 100);
     }
 
-    @Override
-    public void showAsDropDown(View anchor, int xoff, int yoff, int gravity) {
+    public void showAsDropDown(View anchor) {
         if (!isSwitch) {
             addDimBackground(anchor);
         }
         isSwitch = false;
-        super.showAsDropDown(anchor, xoff, yoff, gravity);
+        super.showAsDropDown(anchor);
     }
 
     @Override
@@ -143,6 +149,8 @@ public class SuperPopupWindow extends PopupWindow{
         if (!isSwitch) {
             removeDimBackground();
         }
+        oldX = -1;
+        oldY = -1;
         super.dismiss();
     }
 
@@ -196,6 +204,17 @@ public class SuperPopupWindow extends PopupWindow{
             });
             mBackView.startAnimation(animation);
         }
+    }
+
+    @Override
+    public void update(int x, int y, int width, int height, boolean force) {
+        if (oldX == -1 && oldY == -1) {
+            oldX = x;
+            oldY = y;
+        } else if (oldX != x || oldY != y && isShowing()){
+            mOutsideClickListener.onClicked();
+        }
+        super.update(x, y, width, height, force);
     }
 
 
